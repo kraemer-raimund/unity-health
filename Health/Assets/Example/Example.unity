@@ -1137,7 +1137,7 @@ RectTransform:
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
   m_AnchoredPosition: {x: 0, y: 100}
-  m_SizeDelta: {x: 800, y: 200}
+  m_SizeDelta: {x: 1600, y: 400}
   m_Pivot: {x: 0.5, y: 0}
 --- !u!114 &1191307937
 MonoBehaviour:
@@ -1166,13 +1166,25 @@ MonoBehaviour:
     m_BestFit: 0
     m_MinSize: 3
     m_MaxSize: 48
-    m_Alignment: 1
+    m_Alignment: 0
     m_AlignByGeometry: 0
     m_RichText: 1
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
-    m_LineSpacing: 1
-  m_Text: Press Space to take damage
+    m_LineSpacing: 1.2
+  m_Text: 'Press <b><color=#8080FF>Space</color></b> to take damage
+
+    Press <b><color=#8080FF>H</color></b>
+    to heal a bit over 4 seconds
+
+    Press <b><color=#8080FF>D</color></b> to apply
+    a damage over time effect
+
+    Press <b><color=#8080FF>S</color></b> to toggle
+    self-healing on/off
+
+    Effects stack. Press <b><color=#8080FF>C</color></b>
+    to clear all effects'
 --- !u!222 &1191307938
 CanvasRenderer:
   m_ObjectHideFlags: 0
