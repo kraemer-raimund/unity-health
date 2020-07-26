@@ -6,6 +6,7 @@ For the full license text please refer to the LICENSE file.
 
 using Rakrae.Unity.Health.Events;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Rakrae.Unity.Health.Behaviours
 {
@@ -16,6 +17,7 @@ namespace Rakrae.Unity.Health.Behaviours
 
         [SerializeField] private HealthInitializedEvent _healthInitialized = null;
         [SerializeField] private HealthChangedEvent _healthChanged = null;
+        [SerializeField] private UnityEvent _damageTaken = null;
 
         private Health _health;
 
@@ -33,6 +35,7 @@ namespace Rakrae.Unity.Health.Behaviours
                 _health.Reduce(10);
 
                 _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+                _damageTaken.Invoke();
             }
         }
     }
