@@ -5,44 +5,18 @@ For the full license text please refer to the LICENSE file.
  */
 
 using System.Collections;
-using Rakrae.Unity.Health.Events;
+using Rakrae.Unity.Health.SerializedFieldGroups;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Rakrae.Unity.Health.Behaviours
 {
     public class HealthSystem : MonoBehaviour
     {
         [Header("Health")]
-        [SerializeField] private float _maxHealth = 100.0f;
-        [SerializeField] private float _initialHealth = 100.0f;
+        [SerializeField] private HealthSettings _healthSettings = null;
 
         [Header("Shield")]
-        [SerializeField] private float _maxShieldCharge = 100.0f;
-        [SerializeField] private float _initialShieldCharge = 100.0f;
-        [SerializeField] private float _shieldBlockPercentage = 80.0f;
-        [SerializeField] private bool _enableAutoRecharge = true;
-        [SerializeField] private float _beginRechargeSecondsAfterDamageTaken = 5.0f;
-        [SerializeField] private float _rechargeTicksPerSecond = 2.0f;
-        [SerializeField] private float _rechargeAmountPerTick = 5.0f;
-
-        [Header("Basic Health Events")]
-        [SerializeField] private HealthChangedEvent _healthChanged = null;
-
-        [Header("Advanced Health Events")]
-        [SerializeField] private UnityEvent _damageTaken = null;
-        [SerializeField] private UnityEvent _died = null;
-        [SerializeField] private UnityEvent _partlyHealed = null;
-        [SerializeField] private UnityEvent _fullyHealed = null;
-
-        [Header("Basic Shield Events")]
-        [SerializeField] private ShieldChangedEvent _shieldChanged = null;
-
-        [Header("Advanced Shield Events")]
-        [SerializeField] private UnityEvent _shieldDamaged = null;
-        [SerializeField] private UnityEvent _shieldDestroyed = null;
-        [SerializeField] private UnityEvent _shieldPartlyRecharged = null;
-        [SerializeField] private UnityEvent _shieldFullyRecharged = null;
+        [SerializeField] private ShieldSettings _shieldSettings = null;
 
         private Health _health;
         private PeriodicHealthEffects _periodicHealthEffects;
@@ -65,7 +39,7 @@ namespace Rakrae.Unity.Health.Behaviours
 
             StopRecharging();
 
-            if (_enableAutoRecharge)
+            if (_shieldSettings.EnableAutoRecharge)
             {
                 StartRechargingAfterDelay();
             }
@@ -74,8 +48,8 @@ namespace Rakrae.Unity.Health.Behaviours
 
             if (didBlockDamage)
             {
-                OnShieldChanged();
-                
+                OnShieldChargeChanged();
+
                 if (_shield.CurrentCharge > 0)
                 {
                     OnShieldDamaged();
@@ -163,58 +137,69 @@ namespace Rakrae.Unity.Health.Behaviours
 
         private void OnHealthChanged()
         {
-            _healthChanged.Invoke(new HealthChangedEventArgs(_health.MaxHealth, _health.CurrentHealth));
+            _healthSettings.Events.HealthChanged.Invoke(_health.CurrentHealth);
+        }
+
+        private void OnMaxHealthChanged()
+        {
+            _healthSettings.Events.MaxHealthChanged.Invoke(_health.MaxHealth);
         }
 
         private void OnDamageTaken()
         {
-            _damageTaken.Invoke();
+            _healthSettings.Events.DamageTaken.Invoke();
         }
 
         private void OnDied()
         {
             StopRecharging();
-            _died.Invoke();
+            _healthSettings.Events.Died.Invoke();
         }
 
         private void OnPartlyHealed()
         {
-            _partlyHealed.Invoke();
+            _healthSettings.Events.PartlyHealed.Invoke();
         }
 
         private void OnFullyHealed()
         {
-            _fullyHealed.Invoke();
+            _healthSettings.Events.FullyHealed.Invoke();
         }
 
-        private void OnShieldChanged()
+        private void OnShieldChargeChanged()
         {
-            _shieldChanged.Invoke(new ShieldChangedEventArgs(_shield.MaxCharge, _shield.CurrentCharge));
+            _shieldSettings.Events.ShieldChargeChanged.Invoke(_shield.CurrentCharge);
+        }
+
+        private void OnMaxShieldChargeChanged()
+        {
+            _shieldSettings.Events.MaxShieldChargeChanged.Invoke(_shield.MaxCharge);
         }
 
         private void OnShieldDamaged()
         {
-            _shieldDamaged.Invoke();
+            _shieldSettings.Events.ShieldDamaged.Invoke();
         }
 
         private void OnShieldDestroyed()
         {
-            _shieldDestroyed.Invoke();
+            _shieldSettings.Events.ShieldDestroyed.Invoke();
         }
 
         private void OnShieldPartlyRecharged()
         {
-            _shieldPartlyRecharged.Invoke();
+            _shieldSettings.Events.ShieldPartlyRecharged.Invoke();
         }
 
         private void OnShieldFullyRecharged()
         {
-            _shieldFullyRecharged.Invoke();
+            _shieldSettings.Events.ShieldFullyRecharged.Invoke();
         }
 
         private void InitializeHealth()
         {
-            _health = new Health(_maxHealth, _initialHealth);
+            _health = new Health(_healthSettings.MaxHealth, _healthSettings.InitialHealth);
+            OnMaxHealthChanged();
             OnHealthChanged();
         }
 
@@ -237,8 +222,13 @@ namespace Rakrae.Unity.Health.Behaviours
 
         private void InitializeShield()
         {
-            _shield = new Shield(_maxShieldCharge, _initialShieldCharge, _shieldBlockPercentage);
-            OnShieldChanged();
+            _shield = new Shield(
+                _shieldSettings.MaxShieldCharge,
+                _shieldSettings.InitialShieldCharge,
+                _shieldSettings.ShieldBlockPercentage
+            );
+            OnMaxShieldChargeChanged();
+            OnShieldChargeChanged();
         }
 
         private void StopRecharging()
@@ -252,25 +242,19 @@ namespace Rakrae.Unity.Health.Behaviours
 
         private void StartRechargingAfterDelay()
         {
-            _shieldRecharge = StartCoroutine(
-                ShieldRechargeCoroutine(
-                    _beginRechargeSecondsAfterDamageTaken,
-                    _rechargeTicksPerSecond,
-                    _rechargeAmountPerTick
-                )
-            );
+            _shieldRecharge = StartCoroutine(ShieldRechargeCoroutine(_shieldSettings));
         }
 
-        private IEnumerator ShieldRechargeCoroutine(float delay, float ticksPerSecond, float amountPerTick)
+        private IEnumerator ShieldRechargeCoroutine(ShieldSettings shieldSettings)
         {
-            yield return new WaitForSeconds(delay);
+            yield return new WaitForSeconds(shieldSettings.BeginRechargeSecondsAfterDamageTaken);
 
             while (_shield.CurrentCharge < _shield.MaxCharge)
             {
-                _shield.Recharge(amountPerTick);
-                OnShieldChanged();
+                _shield.Recharge(shieldSettings.RechargeAmountPerTick);
+                OnShieldChargeChanged();
                 OnShieldPartlyRecharged();
-                yield return new WaitForSeconds(1.0f / ticksPerSecond);
+                yield return new WaitForSeconds(1.0f / shieldSettings.RechargeTicksPerSecond);
             }
 
             OnShieldFullyRecharged();

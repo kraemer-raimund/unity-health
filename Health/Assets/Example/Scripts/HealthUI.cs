@@ -4,7 +4,6 @@ Copyright (c) 2020 Raimund Krämer
 For the full license text please refer to the LICENSE file.
  */
 
-using Rakrae.Unity.Health.Events;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -19,23 +18,31 @@ namespace Rakrae.Unity.Health.Example
         [SerializeField] AudioSource _damageTakenSound = null;
         [SerializeField] AudioSource _diedSound = null;
 
-        public void OnHealthChanged(HealthChangedEventArgs healthChangedEventArgs)
+        public void OnHealthChanged(float health)
         {
             if (_healthBar)
             {
-                _healthBar.minValue = 0;
-                _healthBar.maxValue = healthChangedEventArgs.MaxHealth;
-                _healthBar.value = healthChangedEventArgs.CurrentHealth;
+                _healthBar.value = health;
             }
 
             if (_currentHealth)
             {
-                _currentHealth.text = Mathf.RoundToInt(healthChangedEventArgs.CurrentHealth).ToString();
+                _currentHealth.text = Mathf.RoundToInt(health).ToString();
+            }
+        }
+
+        public void OnMaxHealthChanged(float maxHealth)
+        {
+            if (_healthBar)
+            {
+                _healthBar.minValue = 0;
+                _healthBar.maxValue = maxHealth;
+
             }
 
             if (_maxHealth)
             {
-                _maxHealth.text = Mathf.RoundToInt(healthChangedEventArgs.MaxHealth).ToString();
+                _maxHealth.text = Mathf.RoundToInt(maxHealth).ToString();
             }
         }
 

@@ -4,7 +4,6 @@ Copyright (c) 2020 Raimund Krämer
 For the full license text please refer to the LICENSE file.
  */
 
-using Rakrae.Unity.Health.Events;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -20,23 +19,30 @@ namespace Rakrae.Unity.Health.Example
         [SerializeField] AudioSource _shieldDestroyedSound = null;
         [SerializeField] AudioSource _shieldPartlyRechargeSound = null;
 
-        public void OnShieldChanged(ShieldChangedEventArgs shieldChangedEventArgs)
+        public void OnShieldChargeChanged(float shieldCharge)
         {
             if (_shield)
             {
-                _shield.minValue = 0;
-                _shield.maxValue = shieldChangedEventArgs.MaxCharge;
-                _shield.value = shieldChangedEventArgs.CurrentCharge;
+                _shield.value = shieldCharge;
             }
 
             if (_currentShieldCharge)
             {
-                _currentShieldCharge.text = Mathf.RoundToInt(shieldChangedEventArgs.CurrentCharge).ToString();
+                _currentShieldCharge.text = Mathf.RoundToInt(shieldCharge).ToString();
+            }
+        }
+
+        public void OnMaxShieldChargeChanged(float maxShieldCharge)
+        {
+            if (_shield)
+            {
+                _shield.minValue = 0;
+                _shield.maxValue = maxShieldCharge;
             }
 
             if (_maxShieldCharge)
             {
-                _maxShieldCharge.text = Mathf.RoundToInt(shieldChangedEventArgs.MaxCharge).ToString();
+                _maxShieldCharge.text = Mathf.RoundToInt(maxShieldCharge).ToString();
             }
         }
 

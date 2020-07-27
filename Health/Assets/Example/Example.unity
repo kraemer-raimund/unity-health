@@ -401,153 +401,187 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e49aa7fafc08b4242b82180e07e9422c, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _maxHealth: 100
-  _initialHealth: 100
-  _maxShieldCharge: 100
-  _initialShieldCharge: 100
-  _shieldBlockPercentage: 80
-  _enableAutoRecharge: 1
-  _beginRechargeSecondsAfterDamageTaken: 5
-  _rechargeTicksPerSecond: 4
-  _rechargeAmountPerTick: 10
-  _healthChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 264236810}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
-        m_MethodName: OnHealthChanged
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _damageTaken:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 264236810}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
-        m_MethodName: OnDamageTaken
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _died:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 264236810}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
-        m_MethodName: OnDied
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnDied
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _partlyHealed:
-    m_PersistentCalls:
-      m_Calls: []
-  _fullyHealed:
-    m_PersistentCalls:
-      m_Calls: []
-  _shieldChanged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnShieldChanged
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _shieldDamaged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnShieldDamaged
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _shieldDestroyed:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnShieldDestroyed
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _shieldPartlyRecharged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnShieldPartlyRecharged
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  _shieldFullyRecharged:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1437977759}
-        m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
-        m_MethodName: OnShieldFullyRecharged
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+  _healthSettings:
+    _maxHealth: 100
+    _initialHealth: 100
+    _events:
+      _healthChanged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 264236810}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
+            m_MethodName: OnHealthChanged
+            m_Mode: 0
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _maxHealthChanged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 264236810}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
+            m_MethodName: OnMaxHealthChanged
+            m_Mode: 0
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _damageTaken:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 264236810}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
+            m_MethodName: OnDamageTaken
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _died:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 264236810}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.HealthUI, Assembly-CSharp
+            m_MethodName: OnDied
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnDied
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _partlyHealed:
+        m_PersistentCalls:
+          m_Calls: []
+      _fullyHealed:
+        m_PersistentCalls:
+          m_Calls: []
+  _shieldSettings:
+    _maxShieldCharge: 100
+    _initialShieldCharge: 100
+    _shieldBlockPercentage: 80
+    _enableAutoRecharge: 1
+    _beginRechargeSecondsAfterDamageTaken: 5
+    _rechargeTicksPerSecond: 2
+    _rechargeAmountPerTick: 5
+    _events:
+      _shieldChargeChanged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnShieldChargeChanged
+            m_Mode: 0
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _maxShieldChargeChanged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnMaxShieldChargeChanged
+            m_Mode: 0
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _shieldDamaged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnShieldDamaged
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _shieldDestroyed:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnShieldDestroyed
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _shieldPartlyRecharged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnShieldPartlyRecharged
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
+      _shieldFullyRecharged:
+        m_PersistentCalls:
+          m_Calls:
+          - m_Target: {fileID: 1437977759}
+            m_TargetAssemblyTypeName: Rakrae.Unity.Health.Example.ShieldUI, Assembly-CSharp
+            m_MethodName: OnShieldFullyRecharged
+            m_Mode: 1
+            m_Arguments:
+              m_ObjectArgument: {fileID: 0}
+              m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+              m_IntArgument: 0
+              m_FloatArgument: 0
+              m_StringArgument: 
+              m_BoolArgument: 0
+            m_CallState: 2
 --- !u!65 &345743970
 BoxCollider:
   m_ObjectHideFlags: 0
