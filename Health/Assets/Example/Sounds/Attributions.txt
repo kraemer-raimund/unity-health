@@ -1,0 +1,9 @@
+The examples use the following sounds from freesound.org,
+each licensed under either the attribution license (https://creativecommons.org/licenses/by/3.0/)
+or the Creative Commons 0 License (https://creativecommons.org/publicdomain/zero/1.0/):
+
+"Ugh.wav" by user "LukeSharples" (https://freesound.org/people/LukeSharples/sounds/209181/)
+"Wagh.wav" by user "LukeSharples" (https://freesound.org/people/LukeSharples/sounds/209184/)
+"Warning Sound" by user "m_cel" (https://freesound.org/people/m_cel/sounds/507906/)
+"Deflector Shield" by user "Metzik" (https://freesound.org/people/Metzik/sounds/459782/)
+"SFX Lo-Fi Shoot" by user "bolmar" (https://freesound.org/people/bolkmar/sounds/421703/)
