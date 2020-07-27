@@ -7,7 +7,6 @@ For the full license text please refer to the LICENSE file.
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using Rakrae.Unity.Health.Events;
 using UnityEngine;
 
 namespace Rakrae.Unity.Health
@@ -15,39 +14,54 @@ namespace Rakrae.Unity.Health
     public class PeriodicHealthEffects
     {
         private readonly MonoBehaviour _coroutineOwner;
-        private readonly Health _health;
+        private readonly PeriodicHealingEffect _selfHealingEffect = new PeriodicHealingEffect(0.5f, 2);
+
         private readonly ICollection<Coroutine> _periodicHealingEffects = new HashSet<Coroutine>();
         private readonly ICollection<Coroutine> _periodicDamageEffects = new HashSet<Coroutine>();
         private Coroutine _selfHealing;
 
-        public PeriodicHealthEffects(MonoBehaviour coroutineOwner, Health health)
+        public PeriodicHealthEffects(MonoBehaviour coroutineOwner)
         {
             _coroutineOwner = coroutineOwner;
-            _health = health;
         }
 
-        public event EventHandler<HealthChangedEventArgs> HealthChanged;
+        public event EventHandler<float> Damaged;
+        public event EventHandler<float> Healed;
 
         public void AddHealingEffect(PeriodicHealingEffect healingEffect)
         {
-            Coroutine coroutine = _coroutineOwner.StartCoroutine(PeriodicHealingEffectCoroutine(healingEffect));
-            _periodicHealingEffects.Add(coroutine);
-
-            if (healingEffect.DurationSeconds > 0)
+            void applyHealing()
             {
-                _coroutineOwner.StartCoroutine(StopAndRemoveCoroutineAfterDuration(coroutine, _periodicHealingEffects, healingEffect.DurationSeconds));
+                Healed?.Invoke(this, healingEffect.HealingPerTick);
             }
+
+            Coroutine coroutine = _coroutineOwner.StartCoroutine(
+                PeriodicEffectCoroutine(
+                    healingEffect.TicksPerSecond,
+                    healingEffect.FirstTickImmediately,
+                    applyHealing
+                )
+            );
+
+            AddPeriodicEffect(coroutine, _periodicHealingEffects, healingEffect.DurationSeconds);
         }
 
         public void AddDamageEffect(PeriodicDamageEffect damageEffect)
         {
-            Coroutine coroutine = _coroutineOwner.StartCoroutine(PeriodicDamageEffectCoroutine(damageEffect));
-            _periodicDamageEffects.Add(coroutine);
-
-            if (damageEffect.DurationSeconds > 0)
+            void applyDamage()
             {
-                _coroutineOwner.StartCoroutine(StopAndRemoveCoroutineAfterDuration(coroutine, _periodicDamageEffects, damageEffect.DurationSeconds));
+                Damaged?.Invoke(this, damageEffect.DamagePerTick);
             }
+
+            Coroutine coroutine = _coroutineOwner.StartCoroutine(
+                PeriodicEffectCoroutine(
+                    damageEffect.TicksPerSecond,
+                    damageEffect.FirstTickImmediately,
+                    applyDamage
+                )
+            );
+
+            AddPeriodicEffect(coroutine, _periodicDamageEffects, damageEffect.DurationSeconds);
         }
 
         public void ToggleSelfHealing()
@@ -59,7 +73,18 @@ namespace Rakrae.Unity.Health
             }
             else
             {
-                _selfHealing = _coroutineOwner.StartCoroutine(PeriodicHealingEffectCoroutine(new PeriodicHealingEffect(0.5f, 2)));
+                void applyHealing()
+                {
+                    Healed?.Invoke(this, _selfHealingEffect.HealingPerTick);
+                }
+
+                _selfHealing = _coroutineOwner.StartCoroutine(
+                    PeriodicEffectCoroutine(
+                        _selfHealingEffect.TicksPerSecond,
+                        _selfHealingEffect.FirstTickImmediately,
+                        applyHealing
+                    )
+                );
             }
         }
 
@@ -86,37 +111,36 @@ namespace Rakrae.Unity.Health
             }
         }
 
-        private IEnumerator PeriodicHealingEffectCoroutine(PeriodicHealingEffect healingEffect)
+        private void AddPeriodicEffect(Coroutine coroutine, ICollection<Coroutine> coroutines, float durationSeconds)
         {
-            if (healingEffect.FirstTickImmediately)
-            {
-                _health.Heal(healingEffect.HealingPerTick);
-                HealthChanged?.Invoke(this, new HealthChangedEventArgs(_health.CurrentHealth));
-            }
+            coroutines.Add(coroutine);
 
-            while (true)
+            if (durationSeconds > 0)
             {
-                yield return new WaitForSeconds(1 / healingEffect.TicksPerSecond);
-
-                _health.Heal(healingEffect.HealingPerTick);
-                HealthChanged?.Invoke(this, new HealthChangedEventArgs(_health.CurrentHealth));
+                _coroutineOwner.StartCoroutine(
+                    StopAndRemoveCoroutineAfterDuration(
+                        coroutine,
+                        coroutines,
+                        durationSeconds
+                    )
+                );
             }
         }
 
-        private IEnumerator PeriodicDamageEffectCoroutine(PeriodicDamageEffect damageEffect)
+        private IEnumerator PeriodicEffectCoroutine(float ticksPerSecond, bool firstTickImmediately, Action applyEffect)
         {
-            if (damageEffect.FirstTickImmediately)
-            {
-                _health.Reduce(damageEffect.DamagePerTick);
-                HealthChanged?.Invoke(this, new HealthChangedEventArgs(_health.CurrentHealth));
-            }
+            bool isFirstTick = true;
 
             while (true)
             {
-                yield return new WaitForSeconds(1 / damageEffect.TicksPerSecond);
+                if (firstTickImmediately || !isFirstTick)
+                {
+                    applyEffect?.Invoke();
+                }
 
-                _health.Reduce(damageEffect.DamagePerTick);
-                HealthChanged?.Invoke(this, new HealthChangedEventArgs(_health.CurrentHealth));
+                yield return new WaitForSeconds(1 / ticksPerSecond);
+
+                isFirstTick = false;
             }
         }
 

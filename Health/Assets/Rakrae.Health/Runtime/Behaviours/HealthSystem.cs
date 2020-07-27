@@ -24,55 +24,58 @@ namespace Rakrae.Unity.Health.Behaviours
 
         private void Start()
         {
-            _health = new Health(_maxHealth, _initialHealth);
-            _periodicHealthEffects = new PeriodicHealthEffects(this, _health);
-
-            _periodicHealthEffects.HealthChanged += (s, e) => _healthChanged.Invoke(e);
-
-            _healthInitialized.Invoke(new HealthInitializedEventArgs(_maxHealth, _initialHealth));
+            InitializeHealth();
+            InitializePeriodicEffects();
         }
 
-        private void Update()
+        public void ApplyDamage(float amount)
         {
-            if (Input.GetKeyDown(KeyCode.Space))
-            {
-                _health.Reduce(10);
-
-                _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
-                _damageTaken.Invoke();
-            }
-
-            if (Input.GetKeyDown(KeyCode.H))
-            {
-                AddHealingEffect(new PeriodicHealingEffect(2, 5, true, 4));
-            }
-
-            if (Input.GetKeyDown(KeyCode.D))
-            {
-                AddDamageEffect(new PeriodicDamageEffect(1, 4, false, 10));
-            }
-
-            if (Input.GetKeyDown(KeyCode.S))
-            {
-                _periodicHealthEffects.ToggleSelfHealing();
-            }
-
-            if (Input.GetKeyDown(KeyCode.C))
-            {
-                _periodicHealthEffects.ClearAll();
-            }
+            _health.Reduce(amount);
+            _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+            _damageTaken.Invoke();
         }
 
-        private void AddHealingEffect(PeriodicHealingEffect healingEffect)
+        public void AddHealingEffect(PeriodicHealingEffect healingEffect)
         {
             _periodicHealthEffects.AddHealingEffect(healingEffect);
         }
 
-        private void AddDamageEffect(PeriodicDamageEffect damageEffect)
+        public void AddDamageEffect(PeriodicDamageEffect damageEffect)
         {
             _periodicHealthEffects.AddDamageEffect(damageEffect);
         }
 
+        public void ToggleSelfHealing()
+        {
+            _periodicHealthEffects.ToggleSelfHealing();
+        }
 
+        public void ClearPeriodicEffects()
+        {
+            _periodicHealthEffects.ClearAll();
+        }
+
+        private void InitializeHealth()
+        {
+            _health = new Health(_maxHealth, _initialHealth);
+            _healthInitialized.Invoke(new HealthInitializedEventArgs(_maxHealth, _initialHealth));
+        }
+
+        private void InitializePeriodicEffects()
+        {
+            _periodicHealthEffects = new PeriodicHealthEffects(this);
+
+            _periodicHealthEffects.Healed += (s, amount) =>
+            {
+                _health.Heal(amount);
+                _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+            };
+
+            _periodicHealthEffects.Damaged += (s, amount) =>
+            {
+                _health.Reduce(amount);
+                _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+            };
+        }
     }
 }
