@@ -27,7 +27,7 @@ namespace Rakrae.Unity.Health
 
         public void Heal(float amount)
         {
-            CurrentHealth = Math.Max(CurrentHealth + amount, MaxHealth);
+            CurrentHealth = Math.Min(CurrentHealth + amount, MaxHealth);
         }
 
         public void Restore()
