@@ -4,35 +4,115 @@ Copyright (c) 2020 Raimund Krämer
 For the full license text please refer to the LICENSE file.
  */
 
-using Rakrae.Unity.Health.Events;
+using System.Collections;
+using Rakrae.Unity.Health.SerializedFieldGroups;
 using UnityEngine;
-using UnityEngine.Events;
 
 namespace Rakrae.Unity.Health.Behaviours
 {
     public class HealthSystem : MonoBehaviour
     {
-        [SerializeField] private float _maxHealth = 100.0f;
-        [SerializeField] private float _initialHealth = 100.0f;
+        [Header("Health")]
+        [SerializeField] private HealthSettings _healthSettings = null;
 
-        [SerializeField] private HealthInitializedEvent _healthInitialized = null;
-        [SerializeField] private HealthChangedEvent _healthChanged = null;
-        [SerializeField] private UnityEvent _damageTaken = null;
+        [Header("Shield")]
+        [SerializeField] private ShieldSettings _shieldSettings = null;
 
         private Health _health;
         private PeriodicHealthEffects _periodicHealthEffects;
+        private Shield _shield;
+        private Coroutine _shieldRecharge;
 
         private void Start()
         {
             InitializeHealth();
             InitializePeriodicEffects();
+            InitializeShield();
         }
 
         public void ApplyDamage(float amount)
         {
-            _health.Reduce(amount);
-            _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
-            _damageTaken.Invoke();
+            if (amount <= 0 || !_health.IsAlive)
+            {
+                return;
+            }
+
+            StopRecharging();
+
+            if (_shieldSettings.EnableAutoRecharge)
+            {
+                StartRechargingAfterDelay();
+            }
+
+            bool didBlockDamage = _shield.TryBlockDamage(amount, out float damageAfterShield);
+
+            if (didBlockDamage)
+            {
+                OnShieldChargeChanged();
+
+                if (_shield.CurrentCharge > 0)
+                {
+                    OnShieldDamaged();
+                }
+                else
+                {
+                    OnShieldDestroyed();
+                }
+            }
+
+            if (damageAfterShield > 0)
+            {
+                _health.Reduce(damageAfterShield);
+                OnHealthChanged();
+
+                if (_health.IsAlive)
+                {
+                    OnDamageTaken();
+                }
+                else
+                {
+                    OnDied();
+                }
+            }
+        }
+
+        public void Heal(float amount)
+        {
+            if (amount <= 0 || !_health.IsAlive)
+            {
+                return;
+            }
+
+            _health.Heal(amount);
+            OnHealthChanged();
+
+            if (_health.CurrentHealth < _health.MaxHealth)
+            {
+                OnPartlyHealed();
+            }
+            else
+            {
+                OnFullyHealed();
+            }
+        }
+
+        public void RechargeShield(float amount)
+        {
+            if (amount <= 0 || !_health.IsAlive)
+            {
+                return;
+            }
+
+            _shield.Recharge(amount);
+
+            if (_shield.CurrentCharge < _shield.MaxCharge)
+            {
+                OnShieldPartlyRecharged();
+            }
+            else
+            {
+                OnShieldFullyRecharged();
+            }
         }
 
         public void AddHealingEffect(PeriodicHealingEffect healingEffect)
@@ -55,10 +135,72 @@ namespace Rakrae.Unity.Health.Behaviours
             _periodicHealthEffects.ClearAll();
         }
 
+        private void OnHealthChanged()
+        {
+            _healthSettings.Events.HealthChanged.Invoke(_health.CurrentHealth);
+        }
+
+        private void OnMaxHealthChanged()
+        {
+            _healthSettings.Events.MaxHealthChanged.Invoke(_health.MaxHealth);
+        }
+
+        private void OnDamageTaken()
+        {
+            _healthSettings.Events.DamageTaken.Invoke();
+        }
+
+        private void OnDied()
+        {
+            StopRecharging();
+            _healthSettings.Events.Died.Invoke();
+        }
+
+        private void OnPartlyHealed()
+        {
+            _healthSettings.Events.PartlyHealed.Invoke();
+        }
+
+        private void OnFullyHealed()
+        {
+            _healthSettings.Events.FullyHealed.Invoke();
+        }
+
+        private void OnShieldChargeChanged()
+        {
+            _shieldSettings.Events.ShieldChargeChanged.Invoke(_shield.CurrentCharge);
+        }
+
+        private void OnMaxShieldChargeChanged()
+        {
+            _shieldSettings.Events.MaxShieldChargeChanged.Invoke(_shield.MaxCharge);
+        }
+
+        private void OnShieldDamaged()
+        {
+            _shieldSettings.Events.ShieldDamaged.Invoke();
+        }
+
+        private void OnShieldDestroyed()
+        {
+            _shieldSettings.Events.ShieldDestroyed.Invoke();
+        }
+
+        private void OnShieldPartlyRecharged()
+        {
+            _shieldSettings.Events.ShieldPartlyRecharged.Invoke();
+        }
+
+        private void OnShieldFullyRecharged()
+        {
+            _shieldSettings.Events.ShieldFullyRecharged.Invoke();
+        }
+
         private void InitializeHealth()
         {
-            _health = new Health(_maxHealth, _initialHealth);
-            _healthInitialized.Invoke(new HealthInitializedEventArgs(_maxHealth, _initialHealth));
+            _health = new Health(_healthSettings.MaxHealth, _healthSettings.InitialHealth);
+            OnMaxHealthChanged();
+            OnHealthChanged();
         }
 
         private void InitializePeriodicEffects()
@@ -67,15 +209,55 @@ namespace Rakrae.Unity.Health.Behaviours
 
             _periodicHealthEffects.Healed += (s, amount) =>
             {
-                _health.Heal(amount);
-                _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+                Heal(amount);
+                OnDamageTaken();
             };
 
             _periodicHealthEffects.Damaged += (s, amount) =>
             {
-                _health.Reduce(amount);
-                _healthChanged.Invoke(new HealthChangedEventArgs(_health.CurrentHealth));
+                ApplyDamage(amount);
+                OnDamageTaken();
             };
+        }
+
+        private void InitializeShield()
+        {
+            _shield = new Shield(
+                _shieldSettings.MaxShieldCharge,
+                _shieldSettings.InitialShieldCharge,
+                _shieldSettings.ShieldBlockPercentage
+            );
+            OnMaxShieldChargeChanged();
+            OnShieldChargeChanged();
+        }
+
+        private void StopRecharging()
+        {
+            if (_shieldRecharge != null)
+            {
+                StopCoroutine(_shieldRecharge);
+                _shieldRecharge = null;
+            }
+        }
+
+        private void StartRechargingAfterDelay()
+        {
+            _shieldRecharge = StartCoroutine(ShieldRechargeCoroutine(_shieldSettings));
+        }
+
+        private IEnumerator ShieldRechargeCoroutine(ShieldSettings shieldSettings)
+        {
+            yield return new WaitForSeconds(shieldSettings.BeginRechargeSecondsAfterDamageTaken);
+
+            while (_shield.CurrentCharge < _shield.MaxCharge)
+            {
+                _shield.Recharge(shieldSettings.RechargeAmountPerTick);
+                OnShieldChargeChanged();
+                OnShieldPartlyRecharged();
+                yield return new WaitForSeconds(1.0f / shieldSettings.RechargeTicksPerSecond);
+            }
+
+            OnShieldFullyRecharged();
         }
     }
 }

@@ -4,7 +4,6 @@ Copyright (c) 2020 Raimund Krämer
 For the full license text please refer to the LICENSE file.
  */
 
-using Rakrae.Unity.Health.Events;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -16,37 +15,45 @@ namespace Rakrae.Unity.Health.Example
         [SerializeField] Text _currentHealth = null;
         [SerializeField] Text _maxHealth = null;
 
-        public void OnHealthInitialized(HealthInitializedEventArgs healthInitializedEventArgs)
+        [SerializeField] AudioSource _damageTakenSound = null;
+        [SerializeField] AudioSource _diedSound = null;
+
+        public void OnHealthChanged(float health)
+        {
+            if (_healthBar)
+            {
+                _healthBar.value = health;
+            }
+
+            if (_currentHealth)
+            {
+                _currentHealth.text = Mathf.RoundToInt(health).ToString();
+            }
+        }
+
+        public void OnMaxHealthChanged(float maxHealth)
         {
             if (_healthBar)
             {
                 _healthBar.minValue = 0;
-                _healthBar.maxValue = healthInitializedEventArgs.MaxHealth;
-                _healthBar.value = healthInitializedEventArgs.InitialHealth;
-            }
+                _healthBar.maxValue = maxHealth;
 
-            if (_currentHealth)
-            {
-                _currentHealth.text = Mathf.RoundToInt(healthInitializedEventArgs.InitialHealth).ToString();
             }
 
             if (_maxHealth)
             {
-                _maxHealth.text = Mathf.RoundToInt(healthInitializedEventArgs.MaxHealth).ToString();
+                _maxHealth.text = Mathf.RoundToInt(maxHealth).ToString();
             }
         }
 
-        public void OnHealthChanged(HealthChangedEventArgs healthChangedEventArgs)
+        public void OnDamageTaken()
         {
-            if (_healthBar)
-            {
-                _healthBar.value = healthChangedEventArgs.NewHealth;
-            }
+            _damageTakenSound.Play();
+        }
 
-            if (_currentHealth)
-            {
-                _currentHealth.text = Mathf.RoundToInt(healthChangedEventArgs.NewHealth).ToString();
-            }
+        public void OnDied()
+        {
+            _diedSound.Play();
         }
     }
 }
