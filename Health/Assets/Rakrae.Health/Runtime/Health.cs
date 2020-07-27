@@ -13,12 +13,12 @@ namespace Rakrae.Unity.Health
         public Health(float maxHealth, float initialHealth)
         {
             MaxHealth = maxHealth;
-            CurrentHealth = initialHealth;
+            CurrentHealth = Math.Max(initialHealth,  maxHealth);
         }
 
         public bool IsAlive => CurrentHealth > 0;
         public float CurrentHealth { get; private set; }
-        public float MaxHealth { get; private set; }
+        public float MaxHealth { get; }
 
         public void Reduce(float amount)
         {
@@ -28,11 +28,6 @@ namespace Rakrae.Unity.Health
         public void Heal(float amount)
         {
             CurrentHealth = Math.Min(CurrentHealth + amount, MaxHealth);
-        }
-
-        public void Restore()
-        {
-            CurrentHealth = MaxHealth;
         }
     }
 }

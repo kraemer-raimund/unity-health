@@ -16,37 +16,37 @@ namespace Rakrae.Unity.Health.Example
         [SerializeField] Text _currentHealth = null;
         [SerializeField] Text _maxHealth = null;
 
-        public void OnHealthInitialized(HealthInitializedEventArgs healthInitializedEventArgs)
-        {
-            if (_healthBar)
-            {
-                _healthBar.minValue = 0;
-                _healthBar.maxValue = healthInitializedEventArgs.MaxHealth;
-                _healthBar.value = healthInitializedEventArgs.InitialHealth;
-            }
-
-            if (_currentHealth)
-            {
-                _currentHealth.text = Mathf.RoundToInt(healthInitializedEventArgs.InitialHealth).ToString();
-            }
-
-            if (_maxHealth)
-            {
-                _maxHealth.text = Mathf.RoundToInt(healthInitializedEventArgs.MaxHealth).ToString();
-            }
-        }
+        [SerializeField] AudioSource _damageTakenSound = null;
+        [SerializeField] AudioSource _diedSound = null;
 
         public void OnHealthChanged(HealthChangedEventArgs healthChangedEventArgs)
         {
             if (_healthBar)
             {
-                _healthBar.value = healthChangedEventArgs.NewHealth;
+                _healthBar.minValue = 0;
+                _healthBar.maxValue = healthChangedEventArgs.MaxHealth;
+                _healthBar.value = healthChangedEventArgs.CurrentHealth;
             }
 
             if (_currentHealth)
             {
-                _currentHealth.text = Mathf.RoundToInt(healthChangedEventArgs.NewHealth).ToString();
+                _currentHealth.text = Mathf.RoundToInt(healthChangedEventArgs.CurrentHealth).ToString();
             }
+
+            if (_maxHealth)
+            {
+                _maxHealth.text = Mathf.RoundToInt(healthChangedEventArgs.MaxHealth).ToString();
+            }
+        }
+
+        public void OnDamageTaken()
+        {
+            _damageTakenSound.Play();
+        }
+
+        public void OnDied()
+        {
+            _diedSound.Play();
         }
     }
 }

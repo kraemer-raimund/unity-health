@@ -8,11 +8,13 @@ namespace Rakrae.Unity.Health.Events
 {
     public class HealthChangedEventArgs
     {
-        public HealthChangedEventArgs(float newHealth)
+        public HealthChangedEventArgs(float maxHealth, float currentHealth)
         {
-            NewHealth = newHealth;
+            MaxHealth = maxHealth;
+            CurrentHealth = currentHealth;
         }
 
-        public float NewHealth { get; }
+        public float MaxHealth { get; }
+        public float CurrentHealth { get; }
     }
 }

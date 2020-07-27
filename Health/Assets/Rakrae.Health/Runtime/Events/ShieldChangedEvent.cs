@@ -10,7 +10,7 @@ using UnityEngine.Events;
 namespace Rakrae.Unity.Health.Events
 {
     [Serializable]
-    public class HealthInitializedEvent : UnityEvent<HealthInitializedEventArgs>
+    public class ShieldChangedEvent : UnityEvent<ShieldChangedEventArgs>
     {
     }
 }
